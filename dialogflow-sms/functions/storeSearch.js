@@ -2,6 +2,7 @@ exports.handler = async function (context, event, callback) {
     const request = require('request');
     const base = require('airtable').base('appyKjw2rPyzxCufn');
 
+    // get the zip code and session_name from the sessionInfo passed to the webhook
     const inputZip = event.sessionInfo.parameters.zip_code;
     const session_name = event.sessionInfo.session;
     
