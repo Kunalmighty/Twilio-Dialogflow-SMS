@@ -5,7 +5,10 @@ Integrating a Dialogflow bot with Twilio Programmable SMS
 
 ## Twilio Function 
 Change into the "dialogflow-sms" directory
-```cd dialogflow-sms```
+
+```
+cd dialogflow-sms
+```
 
 Rename the ".env.SAMPLE" file to .env and fill in the proper values from Twilio, Airtable and Google. 
 ```
@@ -21,7 +24,10 @@ ZIPCODEAPI_KEY=
 
 ### Run a basic deployment with default settings
 Deploy the project to the dev environment
-```twilio serverless:deploy --environment stage```
+
+```
+twilio serverless:deploy --environment=stage
+```
 
 ### Use the /storeSearch URL for your Webhook
 Change the URL of your DialogFlow CX Webhook to the URL of the /storeSearch function
