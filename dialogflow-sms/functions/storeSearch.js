@@ -24,16 +24,16 @@ exports.handler = async function (context, event, callback) {
 
         // Call zipcodeapi.com's API to compute the distance from the input Zip and the zip of all the stores
         request('https://www.zipcodeapi.com/rest/' + context.ZIPCODEAPI_KEY + '/multi-distance.json/' + inputZip + '/' + zipCodes + '/mile', { json: true }, (err, res, body) => {
-            if (err) {
+            if (body.error_code >= 400) {
                 // handle any errors from zipcodeapi
-                jsonResponse = returnError(err)
-                return callback(null, jsonResponse);
+                jsonResponse = returnError(body.error_msg)
+                return callback(body.error_code, jsonResponse);
             }
             let distances = body.distances;
             // Create sorted list of zip codes and distance to input zip code (ascending to closest zip is first)
             let closestStoreObj = Object.keys(distances)
                 .map(key => ({ [key]: distances[key] }))
-                .sort((a, b) => a[1] - b[1])[0];
+                .sort((a, b) => a[Object.keys(a)[0]] - b[Object.keys(b)[0]])[0];
 
             let closestStoreZip = Object.keys(closestStoreObj)[0]
             console.log('closest store zip for input zip ' + inputZip + ' is ' + closestStoreZip)

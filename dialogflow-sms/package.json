@@ -8,8 +8,10 @@
     "deploy": "twilio-run deploy"
   },
   "dependencies": {
+    "@google-cloud/dialogflow-cx": "^2.14.0",
     "@twilio/runtime-handler": "1.2.0",
     "airtable": "^0.11.1",
+    "pb-util": "^1.0.2",
     "request": "^2.88.2",
     "twilio": "^3.56"
   },
