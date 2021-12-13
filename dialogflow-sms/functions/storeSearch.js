@@ -1,7 +1,9 @@
+const { json } = require('body-parser');
+
 exports.handler = async function (context, event, callback) {
     const request = require('request');
-    const base = require('airtable').base('appyKjw2rPyzxCufn');
-
+    const base = require('airtable').base(context.AIRTABLE_BASE);
+    
     // get the zip code and session_name from the sessionInfo passed to the webhook
     const inputZip = event.sessionInfo.parameters.zip_code;
     const session_name = event.sessionInfo.session;
@@ -13,21 +15,20 @@ exports.handler = async function (context, event, callback) {
         view: 'Grid view'
     }).firstPage(function (err, records) {
         if (err) {
+            console.error(body.error_msg);
             // Handle any errors from Airtable API call
-            jsonResponse = returnError(err)
-            return callback(null, jsonResponse);
+            return callback(body.error_msg, null);
         }
         
         // Create a comma separated list of zip codes from all the stores
         let zipCodes = records.map(storeResult => (storeResult.fields.Zip)).join(",");
-        let closestStoreZip = null;
 
         // Call zipcodeapi.com's API to compute the distance from the input Zip and the zip of all the stores
         request('https://www.zipcodeapi.com/rest/' + context.ZIPCODEAPI_KEY + '/multi-distance.json/' + inputZip + '/' + zipCodes + '/mile', { json: true }, (err, res, body) => {
             if (body.error_code >= 400) {
                 // handle any errors from zipcodeapi
-                jsonResponse = returnError(body.error_msg)
-                return callback(body.error_code, jsonResponse);
+                console.error(body.error_msg);
+                return callback(body.error_msg, null);
             }
             let distances = body.distances;
             // Create sorted list of zip codes and distance to input zip code (ascending to closest zip is first)
@@ -54,20 +55,3 @@ exports.handler = async function (context, event, callback) {
         });
     });
 };
-
-async function returnError(err) {
-    console.error(err);
-    return {
-        // build JSON response to webhook with text that will be sent to user if there is an error
-        fulfillment_response: {
-            messages: [
-                {
-                    text: {
-                        text: ["There was an error locating stores, let me forward you to soomeone who can assist"]
-                    }
-                }
-            ]
-        }
-    };
-    // TODO redirect to agent
-}
