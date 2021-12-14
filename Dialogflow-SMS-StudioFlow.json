@@ -61,13 +61,13 @@
         }
       ],
       "properties": {
-        "service_sid": "ZSce5a9c245ac41d1656e8f437358844d5",
-        "environment_sid": "ZE0dbaa422dc65cef97a63cc37978960c2",
+        "service_sid": "ZS22c60c1ebfd21d98c50cfa30047e54bd",
+        "environment_sid": "ZE0c47d7a7a9930683bbba0e340b38e4c6",
         "offset": {
           "x": 30,
           "y": 420
         },
-        "function_sid": "ZH39193862d38950f93443500d5a4599df",
+        "function_sid": "ZH0fef563428a687c1ecd0b3e6cb12861c",
         "parameters": [
           {
             "value": "{{flow.variables.utterance}}",
@@ -76,21 +76,9 @@
           {
             "value": "{{flow.variables.dialogflow_session_id}}",
             "key": "dialogflow_session_id"
-          },
-          {
-            "value": "sms",
-            "key": "channel"
-          },
-          {
-            "value": "{{trigger.message.ChannelAttributes.from}}",
-            "key": "customer_number"
-          },
-          {
-            "value": "{{trigger.message.ChannelAttributes.twilioNumber}}",
-            "key": "number_called"
           }
         ],
-        "url": "https://dialogflow-sms-7291-stage.twil.io/dialogflow-detect-intent"
+        "url": "https://dialogflow-cx-1539-dev.twil.io/dialogflow-detect-intent"
       }
     },
     {
@@ -121,6 +109,30 @@
       }
     },
     {
+      "name": "SendToFlexAgent",
+      "type": "send-to-flex",
+      "transitions": [
+        {
+          "event": "callComplete"
+        },
+        {
+          "event": "failedToEnqueue"
+        },
+        {
+          "event": "callFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 520,
+          "y": 1460
+        },
+        "workflow": "WW122bdbcbafecd117c9636b479c98d1a5",
+        "channel": "TCa078cdc3e0a83b2e7014929a41b2d03d",
+        "attributes": "{\"name\": \"{{trigger.message.ChannelAttributes.from}}\", \"channelType\": \"{{trigger.message.ChannelAttributes.channel_type}}\", \"channelSid\": \"{{trigger.message.ChannelSid}}\"}"
+      }
+    },
+    {
       "name": "WantsAgent",
       "type": "split-based-on",
       "transitions": [
@@ -138,7 +150,7 @@
                 "{{widgets.DialogflowDetectIntent.parsed.intent.displayName}}"
               ],
               "type": "equal_to",
-              "value": "Agent"
+              "value": "small_talk.agent_hand_off"
             }
           ]
         }
@@ -146,8 +158,8 @@
       "properties": {
         "input": "{{widgets.DialogflowDetectIntent.parsed.intent.displayName}}",
         "offset": {
-          "x": 70,
-          "y": 910
+          "x": 60,
+          "y": 880
         }
       }
     },
@@ -168,8 +180,8 @@
           }
         ],
         "offset": {
-          "x": -690,
-          "y": 410
+          "x": -500,
+          "y": 630
         }
       }
     },
@@ -254,7 +266,7 @@
       "type": "send-message",
       "transitions": [
         {
-          "next": "ConnectToAgent",
+          "next": "SendToFlexAgent",
           "event": "sent"
         },
         {
@@ -271,46 +283,6 @@
         "from": "{{flow.channel.address}}",
         "to": "{{contact.channel.address}}",
         "body": "{% for i in (1..widgets.DialogflowDetectIntent.parsed.responseMessages.size) %}\n{{widgets.DialogflowDetectIntent.parsed.responseMessages[forloop.index0].text.text}}\n{% endfor %}"
-      }
-    },
-    {
-      "name": "ConnectToAgent",
-      "type": "make-outgoing-call-v2",
-      "transitions": [
-        {
-          "event": "answered"
-        },
-        {
-          "event": "busy"
-        },
-        {
-          "event": "noAnswer"
-        },
-        {
-          "event": "failed"
-        }
-      ],
-      "properties": {
-        "machine_detection_speech_threshold": "2400",
-        "detect_answering_machine": false,
-        "send_digits": "",
-        "sip_auth_username": "",
-        "offset": {
-          "x": 560,
-          "y": 1430
-        },
-        "recording_status_callback": "",
-        "sip_auth_password": "",
-        "recording_channels": "mono",
-        "timeout": 60,
-        "machine_detection": "Enable",
-        "trim": "do-not-trim",
-        "record": false,
-        "machine_detection_speech_end_threshold": "1200",
-        "machine_detection_timeout": "30",
-        "from": "{{flow.channel.address}}",
-        "to": "{{contact.channel.address}}",
-        "machine_detection_silence_timeout": "5000"
       }
     }
   ],
